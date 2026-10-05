@@ -1,0 +1,13 @@
+.git
+node_modules
+.next
+.venv
+.env
+.env.*
+.local
+test-results
+playwright-report
+__pycache__
+*.tsbuildinfo
+supabase/.temp
+supabase/.branches
