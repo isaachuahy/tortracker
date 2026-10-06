@@ -1,0 +1,43 @@
+name: End-to-end acceptance
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  notebook:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      SUPABASE_INTERNAL_IMAGE_REGISTRY: docker.io
+      NEXT_TELEMETRY_DISABLED: "1"
+      E2E_WEB_COMMAND: npm start
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: npm ci
+      - run: python -m venv .venv
+      - run: .venv/bin/pip install -r requirements.txt
+      - run: npx supabase start -x studio,realtime,edge-runtime,logflare,vector,imgproxy,supavisor
+      - run: npm run local:setup
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7
+      - run: npx supabase stop
+        if: always()

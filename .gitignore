@@ -205,6 +205,20 @@ cython_debug/
 # Temporary file for partial code execution
 tempCodeRunnerFile.py
 
+# Web app and local integration stack
+node_modules/
+.next/
+.env.*
+!.env.example
+playwright-report/
+test-results/
+supabase/.temp/
+supabase/.branches/
+.local/
+*.tsbuildinfo
+!src/lib/
+!src/lib/**
+
 # Ruff stuff:
 .ruff_cache/
 

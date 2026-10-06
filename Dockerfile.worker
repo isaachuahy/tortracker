@@ -1,0 +1,12 @@
+# syntax=docker/dockerfile:1
+FROM python:3.12-slim
+WORKDIR /app
+ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
+COPY requirements.txt ./
+RUN --mount=type=secret,id=system_ca \
+    if [ -f /run/secrets/system_ca ]; then export PIP_CERT=/run/secrets/system_ca; fi; \
+    pip install --no-cache-dir -r requirements.txt
+RUN useradd --create-home --uid 10001 worker
+COPY --chown=worker:worker worker ./worker
+USER worker
+CMD ["python","-m","worker.main"]
