@@ -3,7 +3,7 @@ process.loadEnvFile(".env.local");
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 if (!["127.0.0.1", "localhost"].includes(new URL(url).hostname))
   throw new Error("Seeding is restricted to local Supabase.");
-const admin = createClient(url, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+const admin = createClient(url, process.env.SUPABASE_SECRET_KEY, {
   auth: { persistSession: false },
 });
 const password = "Tortracker-local-2026!";

@@ -15,12 +15,14 @@ if (!url || !["localhost", "127.0.0.1"].includes(new URL(url).hostname))
   throw new Error("Local setup requires a loopback Supabase instance.");
 const env = {
   NEXT_PUBLIC_SUPABASE_URL: url,
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: data.ANON_KEY,
-  SUPABASE_SERVICE_ROLE_KEY: data.SERVICE_ROLE_KEY,
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: data.PUBLISHABLE_KEY,
+  SUPABASE_SECRET_KEY: data.SECRET_KEY,
   APP_URL: "http://127.0.0.1:3000",
 };
-if (!env.NEXT_PUBLIC_SUPABASE_ANON_KEY || !env.SUPABASE_SERVICE_ROLE_KEY)
-  throw new Error("Local Supabase did not return its keys.");
+if (!env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || !env.SUPABASE_SECRET_KEY)
+  throw new Error(
+    "Local Supabase did not return publishable and secret keys. Update the Supabase CLI and restart the local stack.",
+  );
 mkdirSync(".local", { recursive: true });
 writeFileSync(
   ".env.local",

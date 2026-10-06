@@ -20,7 +20,7 @@ def run() -> None:
     load_dotenv(".env.local")
     load_dotenv(".env")
     url = os.environ["NEXT_PUBLIC_SUPABASE_URL"]
-    key = os.environ["SUPABASE_SERVICE_ROLE_KEY"]
+    key = os.environ["SUPABASE_SECRET_KEY"]
     db = create_client(url, key)
     lease = max(2, int(os.environ.get("JOB_LEASE_SECONDS", "120")))
     poll = max(0.1, float(os.environ.get("WORKER_POLL_SECONDS", "2")))
