@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import Decimal from "decimal.js";
 const admin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  process.env.SUPABASE_SECRET_KEY!,
   { auth: { persistSession: false } },
 );
 const password = "Tortracker-local-2026!";
@@ -109,7 +109,7 @@ async function addPrice(
 test("private sign-in and mobile navigation work", async ({ page }) => {
   const outsider = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     { auth: { persistSession: false } },
   );
   const signup = await outsider.auth.signUp({
@@ -765,7 +765,7 @@ test("another account cannot read, change, export or sign a URL for the owner's 
   // Test RLS directly as the other authenticated account, in addition to app routes.
   const other = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     { auth: { persistSession: false } },
   );
   await other.auth.signInWithPassword({

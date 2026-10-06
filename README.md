@@ -45,7 +45,7 @@ Confirmation and correction happen in one database transaction. Receipt lines, r
 
 Jobs are claimed using FOR UPDATE SKIP LOCKED and expiring lease tokens. The worker renews its lease while extracting. A crashed process can be replaced without losing its job. Results require the current lease and receipt version. Three failures expose a retry action. Explicit retry creates another attempt on the same receipt.
 
-User records are protected by RLS. Writes use guarded database functions; worker-only functions require service_role. The web service uses user sessions and the public anon key. It does not need the service-role key. Storage is private, and original files are shown through short-lived signed URLs.
+User records are protected by RLS. Writes use guarded database functions; worker-only functions require the Postgres service_role role. The web service uses user sessions and a publishable API key (sb_publishable_...). The worker uses a secret API key (sb_secret_...), which grants elevated service_role access and bypasses RLS. Keep that secret out of the web service and browser. Storage is private, and original files are shown through short-lived signed URLs.
 
 Offers keep official source links, conditions, applicable branches and inclusive validity dates. Current-offer filtering uses America/Toronto. Recorded observations remain historical evidence. Unknown branches are excluded from the map.
 
@@ -64,13 +64,13 @@ Railway project: tortracker. Supabase project: ptnrecrrdvkmyemcqrdk.
 
 3.  On the web service configure:
     - NEXT_PUBLIC_SUPABASE_URL=https://ptnrecrrdvkmyemcqrdk.supabase.co
-    - NEXT_PUBLIC_SUPABASE_ANON_KEY from the existing project
+    - NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY from the project's API Keys settings (sb_publishable_...)
     - APP_URL to the web service's HTTPS origin
     - Optional NEXT_PUBLIC_MAP_STYLE_URL for another licensed tile provider
 
     Railway must make the NEXT_PUBLIC variables available at build time. Only public configuration is baked into the browser bundle.
 
-4.  On the worker configure NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY and OPENAI_API_KEY. Optional settings are listed in .env.example. Give the worker no public domain. Keep service credentials out of the web service and Git.
+4.  On the worker configure NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SECRET_KEY from the project's API Keys settings (sb_secret_...), and OPENAI_API_KEY. Optional settings are listed in .env.example. Give the worker no public domain. Keep service credentials out of the web service and Git.
 
 5.  Set Supabase's Auth site URL to the deployed web origin, provision the account, and run the staging acceptance checks below.
 
