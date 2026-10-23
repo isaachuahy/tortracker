@@ -4,6 +4,12 @@ A private, mobile-friendly grocery dashboard for Toronto. Capture receipts and s
 
 The [PRD](tortracker-prd.md) records the original P0 and dashboard extension. Next.js serves Dashboard, Capture, Spending, Prices, Sources, and PC Optimum. A Python worker processes a durable Supabase Postgres job queue; an optional separate Gmail worker imports receipts. Supabase provides authentication, private storage and user-owned records. Maps use MapLibre with OpenFreeMap tiles.
 
+## Notion as the working tracker
+
+When the user chooses Notion, use the Notion connector to maintain the linked Items, Price History, Sales, Receipts, PC Optimum Offers, and PC Optimum Points databases. Discover their current schemas from the user's private tracker; personal workspace links and account settings do not belong in this public repository. The [browser import workflow](docs/browser-imports.md) describes both destinations.
+
+The Notion dashboard is independent of this Next.js/Supabase prototype. Creating Notion databases does not switch the application's storage backend or configure unattended imports. A connected Gmail tool can supply receipts for an authorized agent-driven Notion import after verifying the mailbox; the Python worker below still needs its own OAuth grant and writes to Supabase. Use one chosen record store for each import and verify the saved records there.
+
 ## Run locally
 
 Requirements: Node 22+, Python 3.12+, Docker, and an extraction-provider key.
