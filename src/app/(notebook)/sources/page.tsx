@@ -134,14 +134,14 @@ export default function SourcesPage() {
       </article>
       <article className="source-card">
         <div className="source-card-top"><span className="icon-well"><Tag size={22} /></span><span className="source-status">Import available</span></div>
-        <h2>PC Optimum</h2><p>Track item offers and bonus points alongside cash prices, including dates and the offer’s purchase conditions.</p>
-        <p className="source-detail">Direct account sync is not connected. Import your offers below; receipt emails can use the Gmail importer. Points never reduce the displayed cash price.</p>
-        <div className="source-actions"><a href="#offer-import" className="button secondary" onClick={() => setProvider("pc-optimum")}>Import PC offers <Upload size={15} /></a><a href="https://www.pcoptimum.ca/" target="_blank" rel="noreferrer" className="button text">Open PC Optimum <ArrowUpRight size={15} /></a></div>
+        <h2>PC Optimum</h2><p>Keep personalized offers, spending thresholds, and points transactions in a separate loyalty record.</p>
+        <p className="source-detail">Account sync is not connected. A browser agent can prepare an import from your signed-in account. Itemized receipts still come from email or retailer order history; points never reduce cash prices.</p>
+        <div className="source-actions"><Link href="/loyalty" className="button secondary">Offers and points <ArrowUpRight size={15} /></Link><a href="https://www.pcoptimum.ca/" target="_blank" rel="noreferrer" className="button text">Open PC Optimum <ArrowUpRight size={15} /></a></div>
       </article>
     </section>
     <section className="source-import" id="offer-import" aria-labelledby="import-title">
       <div className="section-heading"><div><p className="eyebrow">YOUR SOURCE, YOUR RECORDS</p><h2 id="import-title">Import flyer or points offers</h2></div><button className="button secondary" onClick={downloadTemplate}><ArrowDownToLine size={16} />Download CSV template</button></div>
-      <p className="muted">Use one row per item and store. Replace the template’s example values with your source. Reimporting the same source ID updates the offer.</p>
+      <p className="muted">Use one row per item and store with a stated cash price. For points-only rewards, basket offers, or points history, use <Link href="/loyalty">PC Optimum</Link>. Replace the template’s example values with your source. Reimporting the same source ID updates the offer.</p>
       <form onSubmit={importOffers}>
         <div className="source-import-controls"><label>Offer source<select aria-label="Offer source" value={provider} onChange={event => setProvider(event.target.value as typeof provider)} disabled={importing}><option value="flyer">Retailer flyer</option><option value="pc-optimum">PC Optimum offers</option></select></label>
         <button type="button" className="button secondary" disabled={importing} onClick={() => fileInput.current?.click()}><Upload size={16} />Choose CSV or JSON</button>

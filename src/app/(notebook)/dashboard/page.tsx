@@ -139,6 +139,7 @@ export default function Dashboard() {
           </table>
         </div> : <div className="empty-state"><Tag size={29} /><h3>{saleFilter === "active" ? "No active sales recorded." : `No ${saleFilter === "all" ? "" : saleFilter + " "}sales recorded.`}</h3><p>Imported offers appear here with their store, source, and validity period.</p><Link className="button secondary" href="/prices">Add a flyer offer</Link></div>}
         <p className="dashboard-table-note">Dates and times use America/Toronto. Timestamped sales end at the listed time; date-only sales include the entire final day. Points are shown separately from cash prices.</p>
+        <p className="dashboard-table-note"><Link className="source-link" href="/loyalty">View personalized PC Optimum offers and points history <ArrowRight size={14} /></Link></p>
       </section>
     </>}
   </div>;

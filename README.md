@@ -2,7 +2,7 @@
 
 A private, mobile-friendly grocery dashboard for Toronto. Capture receipts and shelf labels, import Gmail receipts and authorized flyer feeds, review extracted drafts, and compare recorded unit costs with valid sales and PC Optimum offers.
 
-The [PRD](tortracker-prd.md) records the original P0 and dashboard extension. Next.js serves Dashboard, Capture, Spending, Prices, and Sources. A Python worker processes a durable Supabase Postgres job queue; an optional separate Gmail worker imports receipts. Supabase provides authentication, private storage and user-owned records. Maps use MapLibre with OpenFreeMap tiles.
+The [PRD](tortracker-prd.md) records the original P0 and dashboard extension. Next.js serves Dashboard, Capture, Spending, Prices, Sources, and PC Optimum. A Python worker processes a durable Supabase Postgres job queue; an optional separate Gmail worker imports receipts. Supabase provides authentication, private storage and user-owned records. Maps use MapLibre with OpenFreeMap tiles.
 
 ## Run locally
 
@@ -61,7 +61,7 @@ Use **Sources** to save a Canadian postal code, import CSV/JSON offers, refresh 
 
 - [Gmail setup and behavior](docs/email-import.md): configure a read-only OAuth grant on a separate worker, set its owner UUID and expected mailbox, then run `python -m worker.email_import --once` before enabling polling. Receipt emails become reviewable drafts. ChatGPT's Gmail connection does not automatically authorize a deployed app.
 - [Authorized flyer feeds](docs/flyer-feeds.md): configure `FLYER_FEED_URL`, optional token, and postal-code substitution on the web server. Missing configuration is shown honestly; no provider is marked connected by default.
-- PC Optimum item offers can be imported as CSV/JSON with `points`, `loyalty_program`, sale bounds, and conditions. Its receipt emails use Gmail intake. Direct PC Optimum account synchronization and arbitrary retailer scraping are not implemented.
+- [Browser-assisted flyers and PC Optimum](docs/browser-imports.md): a browser agent can verify a retailer's local flyer or prepare private PC account data for review and import. PC Optimum has separate tables for personalized rewards and signed points transactions, including offers without a cash price. Item offers with an explicit cash price still use the flyer importer. Receipt emails use Gmail intake; itemized order receipts come from retailer order history. No account is connected automatically.
 
 The importer stores only private provenance and status in `email_imports` and `email_import_sources`; OAuth credentials stay in worker environment variables. Imported emails and extracted text are treated as untrusted evidence. Email is never sent, deleted, labeled, or marked read.
 
@@ -104,4 +104,4 @@ The automated suite is not a measurement of extraction quality on real receipts.
 - On staging, confirm browser-independent processing, corrected dashboard totals, no duplicate purchases after retries, and account isolation.
 - Compare one item across two stores with an in-store observation, online observation and valid flyer offer. Verify source links, conversions, expiry and conditions.
 
-Live Gmail authorization, a reachable authorized flyer feed, and production deployment require configured provider and hosting credentials. Fixture tests do not establish those connections or measure real extraction quality. Public signup, account-only PC Optimum imports, watched items and alerts remain outside this extension.
+Live Gmail authorization, a reachable authorized flyer feed, and production deployment require configured provider and hosting credentials. Fixture tests do not establish those connections or measure real extraction quality. Browser-assisted PC Optimum imports require a user-managed signed-in browser profile; unattended account sync, public signup, watched items and alerts remain outside this extension.

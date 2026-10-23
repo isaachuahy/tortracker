@@ -2044,3 +2044,20 @@ tr:last-child td {
     padding: 7px 11px;
   }
 }
+@media (max-width: 600px) {
+  .sidebar nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+  }
+  .sidebar .nav-link {
+    flex-direction: row;
+    gap: 6px;
+    min-height: 39px;
+    padding: 8px 5px;
+  }
+  .sidebar .nav-link svg {
+    flex-shrink: 0;
+    width: 15px;
+  }
+}

@@ -277,7 +277,7 @@ test("Sources imports PC offers from a CSV file, updates repeats, and rejects a 
   await page.getByLabel("Offer import data", { exact: true }).fill(header + "\n" +
     csvRow("2.00", sourceId) + "\n" + csvRow("1.00", sourceId + "-bad", "Unknown product " + nonce()));
   await page.getByRole("button", { name: "Save imported offers", exact: true }).click();
-  await expect(page.getByRole("alert")).toContainText(/unknown item/i);
+  await expect(page.locator("#offer-import").getByRole("alert")).toContainText(/unknown item/i);
   const retained = await client.from("offers_read").select("price").eq("id", saved.data![0].id).single();
   expect(retained.data?.price).toBe("3.5000");
   const otherRetailer = await page.request.post("/api/imports/offers?provider=pc-optimum", {

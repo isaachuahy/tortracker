@@ -10,6 +10,7 @@ import {
   MapPin,
   LayoutDashboard,
   Inbox,
+  Gift,
 } from "lucide-react";
 import { browserClient } from "@/lib/supabase-browser";
 export function Shell({
@@ -26,6 +27,7 @@ export function Shell({
     { href: "/capture", label: "Capture", Icon: Camera },
     { href: "/spending", label: "Spending", Icon: ChartNoAxesCombined },
     { href: "/prices", label: "Prices", Icon: Search },
+    { href: "/loyalty", label: "PC Optimum", Icon: Gift },
     { href: "/sources", label: "Sources", Icon: Inbox },
   ];
   return (
