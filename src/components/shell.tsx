@@ -8,6 +8,8 @@ import {
   ShoppingBag,
   LogOut,
   MapPin,
+  LayoutDashboard,
+  Inbox,
 } from "lucide-react";
 import { browserClient } from "@/lib/supabase-browser";
 export function Shell({
@@ -20,14 +22,16 @@ export function Shell({
   const path = usePathname(),
     router = useRouter();
   const navigation = [
+    { href: "/dashboard", label: "Dashboard", Icon: LayoutDashboard },
     { href: "/capture", label: "Capture", Icon: Camera },
     { href: "/spending", label: "Spending", Icon: ChartNoAxesCombined },
     { href: "/prices", label: "Prices", Icon: Search },
+    { href: "/sources", label: "Sources", Icon: Inbox },
   ];
   return (
     <div className="notebook">
       <aside className="sidebar">
-        <Link href="/capture" className="brand">
+        <Link href="/dashboard" className="brand">
           <ShoppingBag size={25} />
           <span>
             tortracker<span className="brand-dot">.</span>
@@ -40,6 +44,7 @@ export function Shell({
               key={href}
               href={href}
               className={path.startsWith(href) ? "nav-link active" : "nav-link"}
+              aria-current={path.startsWith(href) ? "page" : undefined}
             >
               <Icon size={20} />
               <span>{label}</span>
