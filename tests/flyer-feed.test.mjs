@@ -66,6 +66,16 @@ test("feed bounds reject excessive input before import", () => {
   assert.throws(() => parseFlyerFeed('{"rows":[]}'), /offers array/);
 });
 
+test("choosing PC Optimum supplies the loyalty program before validating points", () => {
+  const input = JSON.stringify([{ ...base, points: "2000" }]);
+  assert.throws(() => parseFlyerFeed(input), /Points require/);
+  const [row] = parseFlyerFeed(input, "application/json", "PC Optimum");
+  assert.equal(row.loyalty_program, "PC Optimum");
+  assert.equal(row.points, 2000);
+  assert.equal(row.price, "4.99");
+  assert.throws(() => parseFlyerFeed(JSON.stringify([{ ...base, points: "2000", loyalty_program: "Unknown program" }]), "application/json", "PC Optimum"), /loyalty_program/);
+});
+
 test("exact mapping rejects unknown or ambiguous names before writes", () => {
   assert.throws(() => mapFlyerOffers(parse({ item_name: "milk 2%" }), items, stores, "test"), /unknown item/);
   assert.throws(() => mapFlyerOffers(parse(), items, [], "test"), /unknown store branch/);

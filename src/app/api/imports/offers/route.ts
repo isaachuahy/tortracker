@@ -28,8 +28,8 @@ export async function POST(request: NextRequest) {
       }
       chunks.push(value);
     }
-    const rows = parseFlyerFeed(Buffer.concat(chunks).toString("utf8"), request.headers.get("content-type") ?? "");
-    if (provider === "pc-optimum") rows.forEach(row => { row.loyalty_program = "PC Optimum"; });
+    const rows = parseFlyerFeed(Buffer.concat(chunks).toString("utf8"), request.headers.get("content-type") ?? "",
+      provider === "pc-optimum" ? "PC Optimum" : undefined);
     const [items, stores] = await Promise.all([
       db.from("items").select("id,name"), db.from("stores").select("id,name"),
     ]);

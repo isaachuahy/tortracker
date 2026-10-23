@@ -72,7 +72,7 @@ export type FlyerRow = z.infer<typeof feedRowSchema>;
 type NamedRecord = { id: string; name: string };
 
 /** Parse only a normalized, bounded provider feed; never guess retailer-specific fields. */
-export function parseFlyerFeed(text: string, contentType = ""): FlyerRow[] {
+export function parseFlyerFeed(text: string, contentType = "", defaultLoyaltyProgram?: "PC Optimum"): FlyerRow[] {
   if (Buffer.byteLength(text, "utf8") > MAX_FEED_BYTES)
     throw new FlyerFeedError(422, "The flyer feed exceeds the 2 MiB limit. Ask the provider to reduce its size.");
   const input = text.replace(/^\uFEFF/, "").trim();
@@ -108,6 +108,8 @@ export function parseFlyerFeed(text: string, contentType = ""): FlyerRow[] {
       throw new FlyerFeedError(422, `Flyer row ${index + 1} must be an object.`);
     // Trim names/CSV values but preserve prices as decimal strings at the API boundary.
     const values = Object.fromEntries(Object.entries(row).map(([key, value]) => [key, typeof value === "string" ? value.trim() : value]));
+    if (defaultLoyaltyProgram && (values.loyalty_program == null || values.loyalty_program === ""))
+      values.loyalty_program = defaultLoyaltyProgram;
     if (Object.keys(values).some(key => !allowedHeaders.has(key)))
       throw new FlyerFeedError(422, `Flyer row ${index + 1} has unsupported fields. Use the documented normalized field names.`);
     const parsed = feedRowSchema.safeParse(values);

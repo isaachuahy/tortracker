@@ -37,7 +37,7 @@ This is an illustrative schema example, not a real price or store. Replace its i
 | `conditions` | May be empty; maximum 1,000 characters. Preserve purchase limits and multibuy rules. |
 | `starts_at`, `ends_at` | Optional paired ISO timestamps with `Z` or a UTC offset. The interval includes the start and excludes the end; end must be later. |
 | `points` | Optional nonnegative integer, maximum 2,147,483,647; defaults to zero. |
-| `loyalty_program` | Blank or `PC Optimum`; required when points are greater than zero. Points are separate from cash price. |
+| `loyalty_program` | Blank or `PC Optimum`; required when points are greater than zero. Points are separate from cash price. Selecting PC Optimum for a manual upload supplies this value when omitted. |
 | `source_id` | Optional unique provider offer-and-branch ID, at most 250 characters. |
 
 Repeated imports upsert the same user's offer rather than adding duplicates. Manual uploads namespace IDs by the selected provider, source URL origin, and store branch, so independent retailers cannot overwrite each other's offers. Each configured endpoint and postal code has a stable hashed provider namespace. When `source_id` is absent, a stable ID is derived from the item, branch, package, dates/times, channel, source link, and loyalty program. Price, regular price, points, and conditions may change without changing that identity. A changed sale period is a new offer. Use explicit stable IDs if the provider updates those identity fields. Changing the configured endpoint or postal code creates a separate source namespace. Existing offers absent from a later feed are retained and expire according to their recorded interval.
