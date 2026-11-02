@@ -80,6 +80,13 @@ export type Offer = {
   regular_price: string | null;
   valid_from: string;
   valid_to: string;
+  /** Exact intervals use an inclusive start and exclusive end. Date-only offers remain inclusive. */
+  starts_at?: string | null;
+  ends_at?: string | null;
+  points?: number;
+  loyalty_program?: "PC Optimum" | null;
+  source_provider?: string | null;
+  source_id?: string | null;
   source_url: string;
   channel: Channel;
   conditions: string;

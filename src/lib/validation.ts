@@ -40,6 +40,7 @@ const url = z
     (v) => ["http:", "https:"].includes(new URL(v).protocol),
     "Use an http or https source link",
   );
+const timestamp = z.iso.datetime({ offset: true });
 export const lineSchema = z.object({
   id: z.uuid().optional(),
   original_text: z.string().max(500),
@@ -96,6 +97,12 @@ export const offerSchema = z
     regular_price: optional(price),
     valid_from: date,
     valid_to: date,
+    starts_at: optional(timestamp),
+    ends_at: optional(timestamp),
+    points: z.number().int().min(0).max(2147483647).default(0),
+    loyalty_program: optional(z.literal("PC Optimum")),
+    source_provider: optional(z.string().trim().min(1).max(100)),
+    source_id: optional(z.string().trim().min(1).max(250)),
     source_url: url,
     channel,
     conditions: z.string().max(1000),
@@ -103,5 +110,21 @@ export const offerSchema = z
   .refine(
     (v) => v.valid_to >= v.valid_from,
     "Offer expiry must be on or after its start date",
+  )
+  .refine(
+    (v) => Boolean(v.starts_at) === Boolean(v.ends_at),
+    "Supply both the offer start and end time, or neither",
+  )
+  .refine(
+    (v) => !v.starts_at || !v.ends_at || Date.parse(v.ends_at) > Date.parse(v.starts_at),
+    "Offer end time must be after its start time",
+  )
+  .refine(
+    (v) => v.points === 0 || Boolean(v.loyalty_program),
+    "Choose a loyalty program for a points offer",
+  )
+  .refine(
+    (v) => Boolean(v.source_provider) === Boolean(v.source_id),
+    "Supply both source provider and source ID, or neither",
   );
 export const offersSchema = z.array(offerSchema).min(1).max(500);

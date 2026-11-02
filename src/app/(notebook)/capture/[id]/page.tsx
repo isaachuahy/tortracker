@@ -587,14 +587,14 @@ export default function Review({
               <span className="badge">PRIVATE</span>
             </div>
             {detail.file_url ? (
-              receipt.mime_type === "application/pdf" ? (
+              receipt.mime_type === "application/pdf" || receipt.mime_type === "text/plain" ? (
                 <a
                   className="button secondary"
                   href={detail.file_url}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Open original PDF
+                  {receipt.mime_type === "text/plain" ? "Open original email text" : "Open original PDF"}
                 </a>
               ) : (
                 <a href={detail.file_url} target="_blank" rel="noreferrer">

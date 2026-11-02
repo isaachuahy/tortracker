@@ -15,6 +15,8 @@ import {
 import Papa from "papaparse";
 import { useWorkspace, request, jsonPost } from "@/lib/use-workspace";
 import { comparable, money, today } from "@/lib/money";
+import { offerStatus } from "@/lib/offers";
+import { saleBoundary } from "@/lib/dashboard";
 import type { Channel, Unit } from "@/lib/types";
 const StoreMap = dynamic(() => import("@/components/store-map"), {
   ssr: false,
@@ -43,6 +45,10 @@ const emptyOffer = () => ({
   regular_price: "",
   valid_from: today(),
   valid_to: today(),
+  starts_at: "",
+  ends_at: "",
+  points: "0",
+  loyalty_program: "",
   source_url: "",
   channel: "in-store",
   conditions: "",
@@ -56,6 +62,11 @@ const clean = (data: Record<string, unknown>) =>
   );
 export default function Prices() {
   const { data, error, refresh } = useWorkspace();
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(new Date()), 30_000);
+    return () => window.clearInterval(timer);
+  }, []);
   const [query, setQuery] = useState(""),
     [selected, setSelected] = useState(""),
     [view, setView] = useState("list");
@@ -121,8 +132,7 @@ export default function Prices() {
     data?.offers.filter(
       (o) =>
         groupIds.includes(o.item_id) &&
-        o.valid_from <= today() &&
-        o.valid_to >= today(),
+        offerStatus(o, now) === "active",
     ) || [];
   const branchIds = [
     ...observations.map((o) => o.branch_id),
@@ -149,7 +159,12 @@ export default function Prices() {
       if (modal === "price")
         await request("/api/prices", jsonPost(clean(observation)));
       else if (modal === "offer")
-        await request("/api/offers", jsonPost([clean(offer)]));
+        await request("/api/offers", jsonPost([clean({
+          ...offer,
+          starts_at: offer.starts_at.trim(),
+          ends_at: offer.ends_at.trim(),
+          points: Number(offer.points || "0"),
+        })]));
       else {
         const parsed = Papa.parse<Record<string, string>>(csv, {
           header: true,
@@ -185,6 +200,10 @@ export default function Prices() {
             regular_price: row.regular_price || "",
             valid_from: row.valid_from,
             valid_to: row.valid_to,
+            starts_at: row.starts_at?.trim() || "",
+            ends_at: row.ends_at?.trim() || "",
+            points: Number(row.points?.trim() || "0"),
+            loyalty_program: row.loyalty_program?.trim() || "",
             source_url: row.source_url,
             channel: row.channel || "in-store",
             conditions: row.conditions || "",
@@ -339,7 +358,7 @@ export default function Prices() {
               <h2>
                 Valid offers <span className="count">{offers.length}</span>
               </h2>
-              <span className="small muted">Within the advertised dates</span>
+              <span className="small muted">Valid now · Toronto time</span>
             </div>
             <div className="offer-grid">
               {offers.map((o) => {
@@ -362,8 +381,21 @@ export default function Prices() {
                     </span>
                     <h3>{branches.join(" · ")}</h3>
                     {priceDisplay(o.price, o.package_size, o.unit)}
+                    {o.regular_price != null && (
+                      <p className="conditions">Regular {money(o.regular_price)}</p>
+                    )}
+                    {(o.points ?? 0) > 0 && (
+                      <p className="small">
+                        +{o.points!.toLocaleString("en-CA")} {o.loyalty_program || "loyalty"} points
+                        <span className="table-sub">Separate from the cash price</span>
+                      </p>
+                    )}
                     <p className="small">
-                      Valid {o.valid_from} to {o.valid_to}
+                      {o.starts_at && o.ends_at ? <>
+                        Starts <time dateTime={o.starts_at}>{saleBoundary(o, "start")}</time>
+                        <br />
+                        Ends <time dateTime={o.ends_at}>{saleBoundary(o, "end")}</time>
+                      </> : <>Valid {o.valid_from} to {o.valid_to}</>}
                     </p>
                     <p className="conditions">
                       {o.conditions || "No additional conditions recorded."}
@@ -541,6 +573,13 @@ export default function Prices() {
                     Use exact item and branch names from your notebook. Separate
                     multiple branches with |. The whole import is checked before
                     saving.
+                  </p>
+                  <p className="small muted">
+                    Optional columns: starts_at and ends_at (supply both ISO
+                    timestamps with a timezone, such as 2026-10-23T09:00:00-04:00),
+                    points (a non-negative whole number), and loyalty_program
+                    (PC Optimum). Exact offers end at ends_at; date-only offers
+                    include the entire final day. Points do not reduce the cash price.
                   </p>
                 </>
               ) : (
@@ -763,6 +802,64 @@ export default function Prices() {
                             setOffer({ ...offer, valid_to: e.target.value })
                           }
                         />
+                      </label>
+                      <label className="span-two">
+                        Exact start time (optional)
+                        <input
+                          aria-label="Offer exact start time"
+                          placeholder="2026-10-23T09:00:00-04:00"
+                          value={offer.starts_at}
+                          onChange={(e) =>
+                            setOffer({ ...offer, starts_at: e.target.value })
+                          }
+                        />
+                        <span className="field-hint">
+                          ISO timestamp with Z or a timezone offset. Supply both exact times, or leave both blank to use dates.
+                        </span>
+                      </label>
+                      <label className="span-two">
+                        Exact end time (optional)
+                        <input
+                          aria-label="Offer exact end time"
+                          placeholder="2026-10-23T21:00:00-04:00"
+                          value={offer.ends_at}
+                          onChange={(e) =>
+                            setOffer({ ...offer, ends_at: e.target.value })
+                          }
+                        />
+                        <span className="field-hint">
+                          ISO timestamp with Z or a timezone offset. The offer expires at this exact time.
+                        </span>
+                      </label>
+                      <label>
+                        Loyalty program
+                        <select
+                          aria-label="Offer loyalty program"
+                          value={offer.loyalty_program}
+                          onChange={(e) =>
+                            setOffer({ ...offer, loyalty_program: e.target.value })
+                          }
+                        >
+                          <option value="">No loyalty program</option>
+                          <option value="PC Optimum">PC Optimum</option>
+                        </select>
+                      </label>
+                      <label>
+                        Bonus points
+                        <input
+                          aria-label="Offer bonus points"
+                          type="number"
+                          min="0"
+                          max="100000000"
+                          step="1"
+                          value={offer.points}
+                          onChange={(e) =>
+                            setOffer({ ...offer, points: e.target.value })
+                          }
+                        />
+                        <span className="field-hint">
+                          Points are recorded separately from the package price. Include earning requirements below.
+                        </span>
                       </label>
                     </>
                   )}

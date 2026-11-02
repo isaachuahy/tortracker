@@ -25,6 +25,8 @@ jobs:
       - run: npm ci
       - run: python -m venv .venv
       - run: .venv/bin/pip install -r requirements.txt
+      - run: npm run test:imports
+      - run: .venv/bin/python -m unittest worker.test_email_import -v
       - run: npx supabase start -x studio,realtime,edge-runtime,logflare,vector,imgproxy,supavisor
       - run: npm run local:setup
       - run: npm run typecheck

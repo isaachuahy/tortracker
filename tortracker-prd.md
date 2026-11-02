@@ -23,7 +23,7 @@ Start with 5–8 selected stores and 15–25 frequently purchased items. Do not 
 | R5 | Price search | Search by item. Show results in a list and on a map. Show store, price, comparable unit price, date, source, channel, and conditions. Open this search from a receipt item. |
 | R6 | Flyer offers | Accept permitted retailer data through manual entry or CSV import. Link each offer to its official source. Record applicable stores, validity dates, and purchase conditions. |
 
-Use three main screens: **Capture**, **Spending**, and **Prices**.
+The original P0 uses **Capture**, **Spending**, and **Prices**. The dashboard extension below adds **Dashboard**, **Sources**, and **PC Optimum**.
 
 ## 3. Data rules
 
@@ -76,6 +76,12 @@ Verify source links, unit conversions, offer expiry, and account isolation. Trea
 
 Build receipt capture and review first. Add the dashboard next. Then add price capture, flyer import, and search.
 
-P1 adds price-history views, automatic source imports, watched items, and sale alerts. Evaluate Open Prices before integration.
+The dashboard extension adds one row per tracked grocery item, latest package and comparable unit costs, and a separate sales table with exact start/end times or inclusive flyer dates. Keep PC Optimum points separate from cash. Persist the owner's postal code and use it for configured regional feeds.
 
-Exclude public signup, bank connections, retailer-account imports, pantry management, and route optimization from P0.
+Add read-only Gmail receipt intake with provenance, durable drafts, and duplicate-safe retries. Add authorized normalized flyer-feed pulls plus CSV/JSON imports for flyers and PC Optimum offers. A deployed Gmail worker requires its own explicit OAuth authorization; show missing configuration and failed imports accurately. Direct PC Optimum account synchronization is not available.
+
+Support browser-assisted imports of personalized PC Optimum rewards and signed points transactions into separate owner-scoped tables. Category/basket offers and points multipliers need no cash price. Preserve partial or unknown validity dates, full conditions, source identities and observation times. A partial ledger is not a balance, and points transactions never create spending. Itemized receipts still come from email or retailer order history. Browser profile authentication remains outside the app; no connection is implied by importing a file.
+
+Later work includes price-history views, watched items, and sale alerts. Evaluate Open Prices before additional source integration.
+
+Exclude public signup, bank connections, unattended retailer-account synchronization, pantry management, and route optimization from P0.
